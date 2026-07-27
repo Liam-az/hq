@@ -1,10 +1,20 @@
 :root {
-  --bg: #0a0a0f;
-  --card: #12121a;
-  --border: #232332;
-  --text: #e8e8ef;
-  --muted: #9a9aad;
-  --accent: #6ee7ff;
+  --bg: #0b1326;
+  --surface: #171f33;
+  --surface-high: #222a3d;
+  --surface-highest: #2d3449;
+  --primary: #8ed5ff;
+  --primary-container: #38bdf8;
+  --on-primary: #00354a;
+  --secondary: #ffc640;
+  --secondary-container: #e3aa00;
+  --on-secondary: #402d00;
+  --text: #dae2fd;
+  --text-variant: #bdc8d1;
+  --outline: #3e484f;
+  --outline-variant: #87929a;
+  --success: #8ed5ff;
+  --warning: #ffc640;
 }
 
 * {
@@ -20,90 +30,261 @@ body {
   font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto,
     Arial, sans-serif;
   line-height: 1.6;
+  -webkit-tap-highlight-color: transparent;
+  overscroll-behavior-y: none;
 }
 
 .container {
-  max-width: 680px;
+  width: 100%;
+  max-width: 520px;
   margin: 0 auto;
-  padding: 96px 24px 64px;
+  padding: 80px 16px 40px;
 }
 
-.badge {
-  display: inline-block;
-  font-size: 13px;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: var(--accent);
-  border: 1px solid var(--border);
-  border-radius: 999px;
-  padding: 6px 14px;
-  margin-bottom: 28px;
+.product-header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 50;
+  height: 56px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 16px;
+  background: rgba(11, 19, 38, 0.8);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid rgba(62, 72, 79, 0.3);
 }
 
-h1 {
-  font-size: clamp(32px, 6vw, 48px);
-  line-height: 1.15;
-  letter-spacing: -0.02em;
-  margin-bottom: 20px;
-}
-
-.accent {
-  color: var(--accent);
-}
-
-.sub {
-  font-size: 18px;
-  color: var(--muted);
-  margin-bottom: 48px;
-}
-
-.sub strong {
+.product-header h1 {
+  font-size: 16px;
+  font-weight: 700;
   color: var(--text);
+  letter-spacing: -0.01em;
 }
 
 .card {
-  background: var(--card);
-  border: 1px solid var(--border);
+  background: var(--surface);
+  border: 1px solid var(--outline);
   border-radius: 16px;
-  padding: 24px 28px;
-  margin-bottom: 24px;
+  padding: 20px;
 }
 
-.card h2 {
+.textarea {
+  width: 100%;
+  background: transparent;
+  color: var(--text);
+  border: none;
+  outline: none;
+  font-size: 16px;
+  line-height: 1.7;
+  resize: none;
+  font-family: inherit;
+}
+
+.textarea::placeholder {
+  color: var(--outline-variant);
+  opacity: 0.7;
+}
+
+.input {
+  width: 100%;
+  background: var(--surface-high);
+  color: var(--text);
+  border: 1px solid var(--outline);
+  border-radius: 12px;
+  padding: 16px;
+  font-size: 16px;
+  outline: none;
+  font-family: inherit;
+  transition: border-color 0.15s ease, background 0.15s ease;
+}
+
+.input::placeholder {
+  color: var(--outline-variant);
+  opacity: 0.7;
+}
+
+.input:focus {
+  border-color: var(--primary);
+  background: var(--surface);
+}
+
+.btn {
+  width: 100%;
+  height: 52px;
+  border: none;
+  border-radius: 12px;
+  font-size: 16px;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: transform 0.1s ease, opacity 0.15s ease;
+}
+
+.btn:active {
+  transform: scale(0.98);
+}
+
+.btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.btn-primary {
+  background: var(--primary);
+  color: var(--on-primary);
+}
+
+.btn-secondary {
+  background: var(--secondary);
+  color: var(--on-secondary);
+}
+
+.micro-copy {
+  font-size: 13px;
+  color: var(--text-variant);
+  text-align: center;
+}
+
+.progress-bar {
+  width: 100%;
+  height: 4px;
+  background: var(--surface-highest);
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.progress-bar > div {
+  height: 100%;
+  background: var(--primary);
+  border-radius: 999px;
+  transition: width 0.3s ease;
+}
+
+.score-ring {
+  position: relative;
+  width: 160px;
+  height: 160px;
+  margin: 0 auto 16px;
+}
+
+.score-ring svg {
+  width: 100%;
+  height: 100%;
+  transform: rotate(-90deg);
+}
+
+.score-ring .bg {
+  fill: none;
+  stroke: var(--surface-highest);
+  stroke-width: 10;
+}
+
+.score-ring .fill {
+  fill: none;
+  stroke: var(--primary);
+  stroke-width: 10;
+  stroke-linecap: round;
+  transition: stroke-dashoffset 0.8s ease;
+}
+
+.score-text {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.score-text .percent {
+  font-size: 40px;
+  font-weight: 800;
+  line-height: 1;
+  color: var(--text);
+}
+
+.score-text .label {
+  font-size: 14px;
+  color: var(--text-variant);
+  margin-top: 4px;
+}
+
+.feedback-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 16px;
+  background: var(--surface);
+  border: 1px solid var(--outline);
+  border-radius: 12px;
+}
+
+.feedback-item .icon {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  font-size: 14px;
+}
+
+.feedback-item.correct .icon {
+  background: rgba(142, 213, 255, 0.15);
+}
+
+.feedback-item.incorrect .icon {
+  background: rgba(255, 198, 64, 0.15);
+}
+
+.feedback-item .q {
   font-size: 15px;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: var(--muted);
-  margin-bottom: 14px;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 4px;
 }
 
-.card ul {
-  list-style: none;
+.feedback-item .a {
+  font-size: 14px;
+  color: var(--text-variant);
+  line-height: 1.5;
 }
 
-.card li {
-  padding: 8px 0;
-  border-bottom: 1px solid var(--border);
+.link {
+  background: none;
+  border: none;
+  color: var(--text-variant);
+  font-size: 14px;
+  cursor: pointer;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
 }
 
-.card li:last-child {
-  border-bottom: none;
+.link:hover {
+  color: var(--text);
 }
 
-.week {
-  display: inline-block;
-  font-weight: 700;
-  color: var(--accent);
-  margin-right: 10px;
+.spinner {
+  width: 20px;
+  height: 20px;
+  border: 2px solid currentColor;
+  border-right-color: transparent;
+  border-radius: 50%;
+  animation: spin 0.75s linear infinite;
 }
 
-.follow {
-  margin-top: 40px;
-  font-size: 17px;
-  color: var(--muted);
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
 }
 
-.handle {
-  color: var(--accent);
-  font-weight: 700;
-}

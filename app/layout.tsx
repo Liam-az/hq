@@ -2,9 +2,9 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Building AI tools for students — in public",
+  title: "KnowWhatYouKnow — Paste notes, get quizzed",
   description:
-    "I'm 16, a student in Israel. First product ships by September 5, 2026. Follow the build log.",
+    "Paste your study notes and get an instant AI quiz that shows what you actually remember.",
 };
 
 export default function RootLayout({
@@ -18,3 +18,4 @@ export default function RootLayout({
     </html>
   );
 }
+

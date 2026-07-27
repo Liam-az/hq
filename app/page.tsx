@@ -1,44 +1,121 @@
+"use client";
+
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+
 export default function Home() {
+  const router = useRouter();
+  const [notes, setNotes] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  const wordCount = notes.trim() ? notes.trim().split(/\s+/).length : 0;
+  const canSubmit = wordCount > 0 && wordCount <= 2000;
+
+  const handleSubmit = () => {
+    if (!canSubmit) return;
+    setLoading(true);
+    // Simulate quiz generation delay, then navigate
+    setTimeout(() => {
+      router.push("/quiz");
+    }, 1200);
+  };
+
   return (
-    <main className="container">
-      <p className="badge">Week 1 of 12 · Building in public</p>
+    <>
+      <header className="product-header">
+        <h1>KnowWhatYouKnow</h1>
+      </header>
 
-      <h1>
-        I&rsquo;m 16. I&rsquo;m building AI tools for students —{" "}
-        <span className="accent">in public.</span>
-      </h1>
+      <main className="container">
+        <div style={{ marginBottom: 24 }}>
+          <h2
+            style={{
+              fontSize: 28,
+              fontWeight: 800,
+              lineHeight: 1.2,
+              marginBottom: 8,
+              letterSpacing: "-0.02em",
+            }}
+          >
+            Generate a quiz
+          </h2>
+          <p style={{ color: "var(--text-variant)", fontSize: 16 }}>
+            Paste your notes and get instant questions that show what you
+            actually remember.
+          </p>
+        </div>
 
-      <p className="sub">
-        No stealth mode. No excuses. One real product, shipped by{" "}
-        <strong>September 5, 2026</strong>, documented the whole way. I&rsquo;m
-        a student, so I build for students — the problems I live with are the
-        ones I solve.
-      </p>
+        <div
+          className="card"
+          style={{
+            padding: 0,
+            overflow: "hidden",
+            marginBottom: 20,
+            boxShadow: "0 4px 24px rgba(0,0,0,0.2)",
+          }}
+        >
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+              padding: "12px 16px",
+              background: "var(--surface-high)",
+              borderBottom: "1px solid var(--outline)",
+            }}
+          >
+            <span style={{ fontSize: 13, color: "var(--text-variant)" }}>
+              Your notes
+            </span>
+            <span
+              style={{
+                fontSize: 12,
+                fontWeight: 700,
+                color: wordCount > 2000 ? "var(--secondary)" : "var(--text-variant)",
+                background: "var(--surface-highest)",
+                padding: "4px 10px",
+                borderRadius: 999,
+              }}
+            >
+              {wordCount} / 2000 words
+            </span>
+          </div>
 
-      <section className="card">
-        <h2>Build log</h2>
-        <ul>
-          <li>
-            <span className="week">Week 1</span>
-            Infrastructure + going public. This site is ship #1. Right now
-            I&rsquo;m collecting the 10 most annoying problems from real
-            student life — one of them becomes product #1.
-          </li>
-        </ul>
-      </section>
+          <div style={{ padding: 16 }}>
+            <textarea
+              className="textarea"
+              rows={12}
+              placeholder="Paste your notes here (or type them)..."
+              value={notes}
+              onChange={(e) => setNotes(e.target.value)}
+              style={{ minHeight: 240 }}
+            />
+          </div>
+        </div>
 
-      <section className="card">
-        <h2>The rules I play by</h2>
-        <ul>
-          <li>Ship first. Ideas only die after a real, promoted launch.</li>
-          <li>Free for students, always useful, no fluff.</li>
-          <li>Honest numbers, honest struggles, posted weekly.</li>
-        </ul>
-      </section>
+        <button
+          className="btn btn-primary"
+          disabled={!canSubmit || loading}
+          onClick={handleSubmit}
+        >
+          {loading ? (
+            <>
+              <span className="spinner" />
+              Generating quiz...
+            </>
+          ) : (
+            <>
+              Quiz Me
+              <span>→</span>
+            </>
+          )}
+        </button>
 
-      <p className="follow">
-        Follow the journey on X → <span className="handle">@yourhandle</span>
-      </p>
-    </main>
+        <p className="micro-copy" style={{ marginTop: 16, opacity: 0.7 }}>
+          Nothing is saved anywhere. Your notes stay on your device.
+        </p>
+      </main>
+    </>
   );
 }
+
