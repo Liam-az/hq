@@ -1,6 +1,6 @@
-"use client";
+﻿"use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 
 const DUMMY_QUESTIONS = [
@@ -12,7 +12,7 @@ const DUMMY_QUESTIONS = [
   {
     id: 2,
     question: "What is the chemical equation for photosynthesis?",
-    correctAnswer: "6CO₂ + 6H₂O → C₆H₁₂O₆ + 6O₂ (carbon dioxide + water → glucose + oxygen in the presence of sunlight).",
+    correctAnswer: "6CO2 + 6H2O -> C6H12O6 + 6O2 (carbon dioxide + water -> glucose + oxygen in the presence of sunlight).",
   },
   {
     id: 3,
@@ -27,12 +27,13 @@ const DUMMY_QUESTIONS = [
   {
     id: 5,
     question: "What is the formula for kinetic energy?",
-    correctAnswer: "KE = ½mv², where m is mass and v is velocity.",
+    correctAnswer: "KE = 1/2 mv^2, where m is mass and v is velocity.",
   },
 ];
 
 export default function QuizPage() {
   const router = useRouter();
+  const inputRef = useRef<HTMLTextAreaElement>(null);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [answer, setAnswer] = useState("");
   const [answers, setAnswers] = useState<Record<number, string>>({});
@@ -43,29 +44,39 @@ export default function QuizPage() {
 
   useEffect(() => {
     setAnswer(answers[currentQuestion.id] || "");
+    inputRef.current?.focus();
   }, [currentIndex, currentQuestion.id, answers]);
 
-  const handleSubmit = () => {
-    if (!answer.trim()) return;
-
+  const goNext = (currentAnswer: string) => {
     setSubmitting(true);
-    setAnswers((prev) => ({ ...prev, [currentQuestion.id]: answer.trim() }));
+    setAnswers((prev) => ({ ...prev, [currentQuestion.id]: currentAnswer.trim() }));
 
     setTimeout(() => {
       setSubmitting(false);
       if (currentIndex < DUMMY_QUESTIONS.length - 1) {
         setCurrentIndex((prev) => prev + 1);
       } else {
-        // Store results in sessionStorage for the results page
         const results = DUMMY_QUESTIONS.map((q) => ({
           ...q,
-          userAnswer: answers[q.id] || (q.id === currentQuestion.id ? answer.trim() : ""),
-          isCorrect: Math.random() > 0.4, // deterministic grading simulation
+          userAnswer: answers[q.id] || (q.id === currentQuestion.id ? currentAnswer.trim() : ""),
+          isCorrect: false,
         }));
         sessionStorage.setItem("kwyk_results", JSON.stringify(results));
         router.push("/results");
       }
     }, 600);
+  };
+
+  const handleSubmit = () => {
+    if (!answer.trim() || submitting) return;
+    goNext(answer);
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    if (e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault();
+      handleSubmit();
+    }
   };
 
   const handleSkip = () => {
@@ -91,23 +102,8 @@ export default function QuizPage() {
 
       <main className="container">
         <div style={{ marginTop: 8, marginBottom: 24 }}>
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
-              marginBottom: 8,
-            }}
-          >
-            <span
-              style={{
-                fontSize: 12,
-                fontWeight: 700,
-                color: "var(--text-variant)",
-                textTransform: "uppercase",
-                letterSpacing: "0.05em",
-              }}
-            >
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8 }}>
+            <span style={{ fontSize: 12, fontWeight: 700, color: "var(--text-variant)", textTransform: "uppercase", letterSpacing: "0.05em" }}>
               Question {currentIndex + 1} of {DUMMY_QUESTIONS.length}
             </span>
             <span style={{ fontSize: 13, color: "var(--primary)" }}>
@@ -119,52 +115,28 @@ export default function QuizPage() {
           </div>
         </div>
 
-        <div
-          className="card"
-          style={{ marginBottom: 24, boxShadow: "0 4px 24px rgba(0,0,0,0.2)" }}
-        >
-          <div
-            style={{
-              width: 40,
-              height: 40,
-              borderRadius: 10,
-              background: "rgba(142, 213, 255, 0.15)",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              marginBottom: 16,
-              fontSize: 20,
-            }}
-          >
+        <div className="card" style={{ marginBottom: 24, boxShadow: "0 4px 24px rgba(0,0,0,0.2)" }}>
+          <div style={{ width: 40, height: 40, borderRadius: 10, background: "rgba(142, 213, 255, 0.15)", display: "flex", alignItems: "center", justifyContent: "center", marginBottom: 16, fontSize: 20 }}>
             🧠
           </div>
-          <h2
-            style={{
-              fontSize: 20,
-              fontWeight: 700,
-              lineHeight: 1.35,
-              color: "var(--text)",
-            }}
-          >
+          <h2 style={{ fontSize: 20, fontWeight: 700, lineHeight: 1.35, color: "var(--text)" }}>
             {currentQuestion.question}
           </h2>
         </div>
 
         <div style={{ marginBottom: 24 }}>
           <textarea
+            ref={inputRef}
             className="input"
             rows={6}
             placeholder="Type your answer..."
             value={answer}
             onChange={(e) => setAnswer(e.target.value)}
+            onKeyDown={handleKeyDown}
             style={{ marginBottom: 16, minHeight: 140 }}
           />
 
-          <button
-            className="btn btn-primary"
-            disabled={!answer.trim() || submitting}
-            onClick={handleSubmit}
-          >
+          <button className="btn btn-primary" disabled={!answer.trim() || submitting} onClick={handleSubmit}>
             {submitting ? (
               <>
                 <span className="spinner" />

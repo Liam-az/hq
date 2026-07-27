@@ -14,6 +14,7 @@ interface ResultItem {
 export default function ResultsPage() {
   const router = useRouter();
   const [results, setResults] = useState<ResultItem[] | null>(null);
+  const [animatedOffset, setAnimatedOffset] = useState<number | null>(null);
 
   useEffect(() => {
     const stored = sessionStorage.getItem("kwyk_results");
@@ -40,6 +41,29 @@ export default function ResultsPage() {
     }
   }, [router]);
 
+  const correctCount = results ? results.filter((r) => r.isCorrect).length : 0;
+  const total = results ? results.length : 0;
+  const percentage = total > 0 ? Math.round((correctCount / total) * 100) : 0;
+  const correctItems = results ? results.filter((r) => r.isCorrect) : [];
+  const incorrectItems = results ? results.filter((r) => !r.isCorrect) : [];
+  const allCorrect = incorrectItems.length === 0 && total > 0;
+
+  const circumference = 2 * Math.PI * 70;
+  const targetOffset = circumference - (percentage / 100) * circumference;
+
+  useEffect(() => {
+    if (results) {
+      setAnimatedOffset(circumference);
+      const timer = setTimeout(() => setAnimatedOffset(targetOffset), 50);
+      return () => clearTimeout(timer);
+    }
+  }, [results, targetOffset]);
+
+  const handleStartFresh = () => {
+    sessionStorage.removeItem("kwyk_results");
+    router.push("/");
+  };
+
   if (!results) {
     return (
       <main className="container" style={{ textAlign: "center", paddingTop: 120 }}>
@@ -49,20 +73,6 @@ export default function ResultsPage() {
     );
   }
 
-  const correctCount = results.filter((r) => r.isCorrect).length;
-  const total = results.length;
-  const percentage = total > 0 ? Math.round((correctCount / total) * 100) : 0;
-  const correctItems = results.filter((r) => r.isCorrect);
-  const incorrectItems = results.filter((r) => !r.isCorrect);
-
-  const circumference = 2 * Math.PI * 70;
-  const strokeDashoffset = circumference - (percentage / 100) * circumference;
-
-  const handleStartFresh = () => {
-    sessionStorage.removeItem("kwyk_results");
-    router.push("/");
-  };
-
   return (
     <>
       <header className="product-header">
@@ -70,24 +80,8 @@ export default function ResultsPage() {
       </header>
 
       <main className="container">
-        <div
-          className="card"
-          style={{
-            textAlign: "center",
-            marginBottom: 24,
-            boxShadow: "0 4px 24px rgba(0,0,0,0.2)",
-          }}
-        >
-          <p
-            style={{
-              fontSize: 12,
-              fontWeight: 700,
-              color: "var(--text-variant)",
-              textTransform: "uppercase",
-              letterSpacing: "0.05em",
-              marginBottom: 16,
-            }}
-          >
+        <div className="card" style={{ textAlign: "center", marginBottom: 24, boxShadow: "0 4px 24px rgba(0,0,0,0.2)" }}>
+          <p style={{ fontSize: 12, fontWeight: 700, color: "var(--text-variant)", textTransform: "uppercase", letterSpacing: "0.05em", marginBottom: 16 }}>
             Your Overall Score
           </p>
 
@@ -98,20 +92,20 @@ export default function ResultsPage() {
                 className="fill"
                 cx="80" cy="80" r="70"
                 strokeDasharray={circumference}
-                strokeDashoffset={strokeDashoffset}
+                strokeDashoffset={animatedOffset ?? targetOffset}
               />
             </svg>
             <div className="score-text">
               <span className="percent">{percentage}%</span>
-              <span className="label">
-                {correctCount}/{total} correct
-              </span>
+              <span className="label">{correctCount}/{total} correct</span>
             </div>
           </div>
 
           <p style={{ color: "var(--text-variant)", fontSize: 15, lineHeight: 1.5 }}>
             {percentage >= 80
-              ? "Strong work. You know this material well."
+              ? allCorrect
+                ? "Perfect score. You know this material inside out."
+                : "Strong work. You know this material well."
               : percentage >= 50
               ? "You're getting there. Review the gaps below."
               : "Focus on the topics below — that's where the real learning happens."}
@@ -161,13 +155,15 @@ export default function ResultsPage() {
           </section>
         )}
 
-        <button
-          className="btn btn-secondary"
-          onClick={() => router.push("/quiz")}
-          style={{ marginBottom: 12 }}
-        >
-          🔄 Retry What You Missed
-        </button>
+        {allCorrect ? (
+          <button className="btn btn-primary" onClick={handleStartFresh} style={{ marginBottom: 12 }}>
+            Start a new quiz
+          </button>
+        ) : (
+          <button className="btn btn-secondary" onClick={() => router.push("/quiz")} style={{ marginBottom: 12 }}>
+            🔄 Retry What You Missed
+          </button>
+        )}
 
         <div style={{ textAlign: "center" }}>
           <button className="link" onClick={handleStartFresh}>

@@ -3,6 +3,12 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 
+const SAMPLE_NOTES = `Photosynthesis is the process by which plants use sunlight, water, and carbon dioxide to create oxygen and energy in the form of sugar.
+
+The chemical equation is: 6CO2 + 6H2O → C6H12O6 + 6O2
+
+Mitosis produces two identical diploid daughter cells. Meiosis produces four genetically different haploid cells.`;
+
 export default function Home() {
   const router = useRouter();
   const [notes, setNotes] = useState("");
@@ -14,10 +20,13 @@ export default function Home() {
   const handleSubmit = () => {
     if (!canSubmit) return;
     setLoading(true);
-    // Simulate quiz generation delay, then navigate
     setTimeout(() => {
       router.push("/quiz");
     }, 1200);
+  };
+
+  const handleSample = () => {
+    setNotes(SAMPLE_NOTES);
   };
 
   return (
@@ -111,9 +120,21 @@ export default function Home() {
           )}
         </button>
 
-        <p className="micro-copy" style={{ marginTop: 16, opacity: 0.7 }}>
-          Nothing is saved anywhere. Your notes stay on your device.
-        </p>
+        <div style={{ marginTop: 16, textAlign: "center" }}>
+          {notes.trim() === "" ? (
+            <button
+              className="link"
+              onClick={handleSample}
+              style={{ fontSize: 13 }}
+            >
+              Try with sample notes →
+            </button>
+          ) : (
+            <p className="micro-copy" style={{ opacity: 0.7 }}>
+              Nothing is saved anywhere. Your notes stay on your device.
+            </p>
+          )}
+        </div>
       </main>
     </>
   );
